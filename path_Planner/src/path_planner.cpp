@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <std_msgs/Int8.h>
+#include <std_msgs/UInt8.h>
 
 #include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.h>
@@ -22,9 +23,15 @@
 using namespace std;
 using namespace cv;
 
+std_msgs::UInt8 enabler;
 cv::Mat src;
 simulator_sauvc_test::Coordinates object_server;
 ros::ServiceClient object_client;
+
+// Coordinates pub;isher
+ros::NodeHandle nh;
+ros::Publisher enable_yellow_flare_server_pub=nh.advertise<std_msgs::UInt8>("/enable_yellow_flare_server",1);
+ros::Publisher enable_gate_server_pub=nh.advertise<std_msgs::UInt8>("/enable_gate_server",1);
 
 double Distance(double center_x, double centyer_y, double width, double height) {
 }
@@ -36,12 +43,14 @@ void initialHeave() {
 
 }
 
-void preQualify_phase1() {
+void preQualify_phase1() {    // gate detection
 
   bool complete = false;
-  //MoveCommand *phase1_command = new MoveCommand(); 
+  //MoveCommand *phase1_command = new MoveCommand();
   double Gate_center_x, Gate_center_y, width, height;
   while(!complete) {
+      enabler.data = 1;
+      enable_gate_server_pub.publish(enabler);
       object_server.request.dummy = 1;
       if(object_client.call(object_server)) {
        ROS_INFO("Gate centre Coordinates are: [%f,%f] ##",
@@ -51,12 +60,12 @@ void preQualify_phase1() {
        width = object_server.response.w[0];
        height = object_server.response.h[0];
       }
-      
+
       double distance;
       //distance = Distance(Gate_center_x, Gate_center_y, width, height);
       if(distance < 3) {
-    
-          object_server.request.dummy = 0; 
+
+          object_server.request.dummy = 0;
          // phase1_command->surge(28);//in ft.s value assigned can change ur wish
 
       }
@@ -67,16 +76,22 @@ void preQualify_phase1() {
       //add an logic at end to come out of the while loop like if complete crossing the gate, set complete = true
   }
   //delete phase1_command;
-  
+
+  // stop server
+  enabler.data = 0;
+  enable_gate_server_pub.publish(enabler);
+
 }
 
-void preQualify_phase2() {
+void preQualify_phase2() {    // yellow flare
 
   bool complete = false;
   //MoveCommand *phase2_command = new MoveCommand();
   double Marker_center_x, Marker_center_y, width, height;
   while(!complete) {
-      object_server.request.dummy = 2;
+      enabler.data = 1;
+      enable_yellow_flare_server_pub.publish(enabler);
+      object_server.request.dummy = 1;
       if(object_client.call(object_server)) {
        ROS_INFO("Marker centre Coordinates are: [%f,%f] ##",
               object_server.response.x[0],object_server.response.y[0]);
@@ -88,15 +103,15 @@ void preQualify_phase2() {
       double distance;
       //distance = Distance(Gate_center_x, Gate_center_y, width, height);
       if(distance < 3) {
-          
-         /* object_server.request.dummy = 0; 
+
+         /* object_server.request.dummy = 0;
           phase2_command->sway(-5); // -ve for left sway
           phase2_command->surge();  //add surge values accordingly
           phase2_command->yaw(90);
           phase2_command->surge();
           phase2_command->yaw(90);
           phase2_command->surge();
-          phase2_command->sway(5); 
+          phase2_command->sway(5);
 */
       }
       else {
@@ -107,17 +122,23 @@ void preQualify_phase2() {
   }
   //delete phase2_command;
 
+  // stop server
+  enabler.data = 0;
+  enable_yellow_flare_server_pub.publish(enabler);
+
 }
 
 void preQualify_phase3() {
-  
- // MoveCommand *phase3_command = new MoveCommand(); 
-  
+
+ // MoveCommand *phase3_command = new MoveCommand();
+
   object_server.request.dummy = 1;
   double distance;
   double Gate_center_x, Gate_center_y, width, height;
   while(distance > 3) {
-      
+    enabler.data = 1;
+    enable_gate_server_pub.publish(enabler);
+
       if(object_client.call(object_server)) {
        ROS_INFO("Gate centre Coordinates are: [%f,%f] ##",
               object_server.response.x[0],object_server.response.y[0]);
@@ -126,13 +147,18 @@ void preQualify_phase3() {
        width = object_server.response.w[0];
        height = object_server.response.h[0];
       }
-      
+
       //distance = Distance(Gate_center_x, Gate_center_y, width, height);
    //   phase3_command->surge(); // add value accordingly
   }
 
   //phase3_command->surge(8); //assume 8ft to surge for completion of final gate cross
   //delete phase3_command;
+
+  // stop server
+  enabler.data = 0;
+  enable_gate_server_pub.publish(enabler);
+
 }
 
 void finalSurfaceUP() {
@@ -143,10 +169,12 @@ void finalSurfaceUP() {
 }
 
 int main(int argc, char **argv){
-  
+
   ros::init(argc,argv,"PathPlanner");
-  ros::NodeHandle nh;
+  // ros::NodeHandle nh;
   ROS_INFO("Prequalification starts");
+
+
   //gate_client = nh.serviceClient<simulator_sauvc_test::Coordinates>("gate_coordinates");
   initialHeave();
   preQualify_phase1();
