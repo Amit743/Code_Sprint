@@ -26,6 +26,9 @@ cv::Mat src;
 simulator_sauvc_test::Coordinates object_server;
 ros::ServiceClient object_client;
 
+double Distance(double center_x, double centyer_y, double width, double height) {
+}
+
 void initialHeave() {
 
   //MoveCommand *initial = new MoveCommand();
@@ -37,17 +40,20 @@ void preQualify_phase1() {
 
   bool complete = false;
   //MoveCommand *phase1_command = new MoveCommand(); 
- 
+  double Gate_center_x, Gate_center_y, width, height;
   while(!complete) {
       object_server.request.dummy = 1;
       if(object_client.call(object_server)) {
        ROS_INFO("Gate centre Coordinates are: [%f,%f] ##",
               object_server.response.x[0],object_server.response.y[0]);
+       Gate_center_x = object_server.response.x[0];
+       Gate_center_y = object_server.response.y[0];
+       width = object_server.response.w[0];
+       height = object_server.response.h[0];
       }
-      float Gate_center_x = object_server.response.x[0];
-      float Gate_center_y = object_server.response.y[0];
+      
       double distance;
-      //distance =
+      //distance = Distance(Gate_center_x, Gate_center_y, width, height);
       if(distance < 3) {
     
           object_server.request.dummy = 0; 
@@ -68,16 +74,19 @@ void preQualify_phase2() {
 
   bool complete = false;
   //MoveCommand *phase2_command = new MoveCommand();
+  double Marker_center_x, Marker_center_y, width, height;
   while(!complete) {
-      object_server.request.dummy = 1;
+      object_server.request.dummy = 2;
       if(object_client.call(object_server)) {
        ROS_INFO("Marker centre Coordinates are: [%f,%f] ##",
               object_server.response.x[0],object_server.response.y[0]);
+       Marker_center_x = object_server.response.x[0];
+       Marker_center_y = object_server.response.y[0];
+       width = object_server.response.w[0];
+       height = object_server.response.h[0];
       }
-      float Marker_center_x = object_server.response.x[0];
-      float Marker_center_y = object_server.response.y[0];
       double distance;
-      //distance =
+      //distance = Distance(Gate_center_x, Gate_center_y, width, height);
       if(distance < 3) {
           
          /* object_server.request.dummy = 0; 
@@ -106,15 +115,19 @@ void preQualify_phase3() {
   
   object_server.request.dummy = 1;
   double distance;
+  double Gate_center_x, Gate_center_y, width, height;
   while(distance > 3) {
       
       if(object_client.call(object_server)) {
        ROS_INFO("Gate centre Coordinates are: [%f,%f] ##",
               object_server.response.x[0],object_server.response.y[0]);
+       Gate_center_x = object_server.response.x[0];
+       Gate_center_y = object_server.response.y[0];
+       width = object_server.response.w[0];
+       height = object_server.response.h[0];
       }
-      float Gate_center_x = object_server.response.x[0];
-      float Gate_center_y = object_server.response.y[0];
-      //distance =
+      
+      //distance = Distance(Gate_center_x, Gate_center_y, width, height);
    //   phase3_command->surge(); // add value accordingly
   }
 
