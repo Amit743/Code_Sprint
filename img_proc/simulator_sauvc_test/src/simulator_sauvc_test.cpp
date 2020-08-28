@@ -148,7 +148,7 @@ void SimSauvcTest::imageProcessingGate() {
   GT_green.gauss_frame=GT.gauss_frame.clone();
   cv::inRange(GT.gauss_frame, Scalar(GT.thresh_l_B, GT.thresh_l_G, GT.thresh_l_R), Scalar(GT.thresh_h_B, GT.thresh_h_G ,GT.thresh_h_R),GT.gray_frame);
   cv::inRange(GT_green.gauss_frame, Scalar(GT_green.thresh_l_B, GT_green.thresh_l_G, GT_green.thresh_l_R), Scalar(GT_green.thresh_h_B, GT_green.thresh_h_G ,GT_green.thresh_h_R),GT_green.gray_frame);
-  GT.gray_frame=(GT.gray_frame | GT_green.gray_frame);
+  // GT.gray_frame=(GT.gray_frame | GT_green.gray_frame);
   cv::Canny( GT.gray_frame,GT.canny_frame,GT.canny_low_thresh,GT.canny_ratio,GT.canny_kernel_size);
 
   int min_x=1000,min_y=1000, max_x=0, max_y=0;
@@ -166,7 +166,7 @@ void SimSauvcTest::imageProcessingGate() {
       }
       else a=90;
 
-      if (abs(a)>85){
+      if (abs(a)>85  || abs(a)<10){
       min_x=min(min_x,(min(l[0],l[2])));
       max_x=max(max_x,(max(l[0],l[2])));
       min_y=min(min_y,(min(l[1],l[3])));
