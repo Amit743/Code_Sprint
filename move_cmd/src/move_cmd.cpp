@@ -2,6 +2,7 @@
 move_cmd::move_cmd(ros::NodeHandle _nh): nh(_nh){
   cmd_pub = nh.advertise<hammerhead_control::MoveCmd>("/move_cmd", 100);
   mode_pub = nh.advertise<std_msgs::UInt8>("/set_mode", 10,true);
+  bot_pos= nh.subscribe("bot_position",10,&move_cmd::distance,this)
   ROS_INFO("move_cmd::move_cmd()");
   a.wait_for_max_timer_to_timeout = 0;
   a.is_surge = 0;
@@ -33,7 +34,14 @@ move_cmd::move_cmd(ros::NodeHandle _nh): nh(_nh){
 move_cmd::~move_cmd(){
 
 }
-
+void distance(const hammerhead_control::Position::ConstPtr &msg){
+  pos.x=msg->x;
+  pos.y=msg->y;
+  pos.z=msg->z;
+  pos.pitch=0;
+  pos.roll=0;
+  pos.yaw=msg->yaw;
+}
 void move_cmd::enterHoverMode(){
   mode.data = HOVER;
   mode_pub.publish(mode);
@@ -155,6 +163,7 @@ void move_cmd::heave(float dep){
 }
 
 void move_cmd::yaw(double angle){
+  angle=3.1415/180*angle;
   enterMovementMode();
   a.wait_for_max_timer_to_timeout = 1;
   a.is_surge = 0;
@@ -170,7 +179,7 @@ void move_cmd::yaw(double angle){
   a.sway_time = 0;
   a.sway = 0;
 
-  a.yaw_speed = 10;
+  a.yaw_speed = 1;
   a.yaw_time = abs(angle)/a.yaw_speed;
   a.yaw = angle;
 
@@ -186,6 +195,15 @@ void move_cmd::yaw(double angle){
   ros::Duration(a.yaw_time).sleep();
   //enterHoverMode();
 }
+void move_cmd::revolve(double angle,double radius=1){
+  enterMovementMode();
+  int steps = (int)(angle/10);
+  for(int i=0; i<steps;i++){
+    surge(2*radius);
+    yaw(10);
+    ROS_INFO("%f %c complete",100.0*i/steps,'%');
+  }
+}
 
 int move_cmd::sign(int i){
   return (i<0)?-1:1;
@@ -198,26 +216,29 @@ int main(int argc, char **argv) {
   ros::Rate loop_rate(30);
   //while (ros::ok()) {
     ros::spinOnce();
-    ROS_INFO("test::enterHoverMode()");
-    auv.enterHoverMode();
-    ros::Duration(7).sleep();
+    // ROS_INFO("test::enterHoverMode()");
+    // auv.enterHoverMode();
+    // ros::Duration(10).sleep();
     ROS_INFO("test::surge(10)");
-    auv.surge(10);
-    ROS_INFO("test::surge(-10)");
-    auv.surge(-10);
-    ROS_INFO("test::sway(10)");
-    auv.sway(10);
-    ROS_INFO("test::heave(1050)");
-    auv.heave(1000);
-    ROS_INFO("test::heave(980)");
-    auv.heave(980);
-    ROS_INFO("test::yaw(90)");
-    auv.yaw(90);
-    ROS_INFO("test::sway(-10)");
-    auv.sway(-10);
-    ROS_INFO("test::yaw(-90)");
-    auv.yaw(-90);
-    ROS_INFO("test::enterSurfaceMode()");
+    auv.surge(1.5);
+    // ROS_INFO("test::surge(-10)");
+    // auv.surge(-10);
+    // ROS_INFO("test::sway(10)");
+    // auv.sway(10);
+    // ROS_INFO("test::sway(-10)");
+    // auv.sway(-10);
+    ROS_INFO("test::revolve(90)");
+    auv.revolve(360,2);
+    // ROS_INFO("test::heave(1050)");
+    // auv.heave(1000);
+    // ROS_INFO("test::heave(980)");
+    // auv.heave(980);
+
+    // ROS_INFO("test::yaw(90)");
+    // auv.yaw(90);
+    // ROS_INFO("test::yaw(-90)");
+    // auv.yaw(-180);
+    // ROS_INFO("test::enterSurfaceMode()");
     ros::Duration(5).sleep();
     auv.enterHoverMode();
     ros::Duration(5).sleep();

@@ -20,11 +20,16 @@ class move_cmd {
     void sway(int);
     void heave(float);
     void yaw(double);
+    void revolve(double,double);
+    hammerhead_control::Position pos;
 
   private:
     int sign(int);
+    void distance(const hammerhead_control::Position::ConstPtr);
     ros::NodeHandle nh;
     ros::Publisher cmd_pub, mode_pub;
+    ros::Subscriber bot_pos;
+
 
     enum Mode { SURFACE, HOVER, MOVEMENT };
     std_msgs::UInt8 mode;
