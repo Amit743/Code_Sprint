@@ -24,7 +24,7 @@ using namespace std;
 using namespace cv;
 #define K 200
 //cm
-#define gateHeight 100
+#define gateHeight 100 
 #define gateWidth 200
 #define pixelWidth 648
 #define pixelHeight 488
