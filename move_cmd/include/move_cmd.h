@@ -16,18 +16,19 @@ class move_cmd {
     void enterHoverMode();
     void enterMovementMode();
     void enterSurfaceMode();
-    void surge(int tim);
-    void sway(int tim, int vel);
-    void heave(int tim, float dep);
-    void yaw(double angle);
+    void surge(int);
+    void sway(int);
+    void heave(float);
+    void yaw(double);
 
   private:
+    int sign(int);
     ros::NodeHandle nh;
     ros::Publisher cmd_pub, mode_pub;
 
     enum Mode { SURFACE, HOVER, MOVEMENT };
     std_msgs::UInt8 mode;
-
+    hammerhead_control::MoveCmd a;
     hammerhead_control::Position current_pos, final_pos, detect_pos;
 
 
