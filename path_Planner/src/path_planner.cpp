@@ -32,9 +32,17 @@ using namespace cv;
 #define fy 200
 #define to_t_surge 5
 #define to_t_sway 2
- 
+
 ros::Publisher enable_yellow_flare_server_pub=nh.advertise<std_msgs::UInt8>("/enable_yellow_flare_server",1);
 ros::Publisher enable_gate_server_pub=nh.advertise<std_msgs::UInt8>("/enable_gate_server",1);
+=======
+
+std_msgs::UInt8 enabler;
+
+ros::Publisher enable_yellow_flare_server_pub;
+ros::Publisher enable_gate_server_pub;
+simulator_sauvc_test::Coordinates object_server;
+ros::ServiceClient object_client1,object_client2;
 struct target{
   float x,y,d;
 };
@@ -62,7 +70,7 @@ void preQualify_phase1() {    // gate detection
       enabler.data = 1;
       enable_gate_server_pub.publish(enabler);
       object_server.request.dummy = 1;
-      if(object_client.call(object_server)) {
+      if(object_client1.call(object_server)) {
        ROS_INFO("Gate centre Coordinates are: [%f,%f] ##",
               object_server.response.x[0],object_server.response.y[0]);
        Gate_center_x = object_server.response.x[0];
@@ -102,7 +110,7 @@ void preQualify_phase2() {    // yellow flare
       enabler.data = 1;
       enable_yellow_flare_server_pub.publish(enabler);
       object_server.request.dummy = 1;
-      if(object_client.call(object_server)) {
+      if(object_client2.call(object_server)) {
        ROS_INFO("Marker centre Coordinates are: [%f,%f] ##",
               object_server.response.x[0],object_server.response.y[0]);
        Marker_center_x = object_server.response.x[0];
@@ -149,7 +157,7 @@ void preQualify_phase3() {
     enabler.data = 1;
     enable_gate_server_pub.publish(enabler);
 
-      if(object_client.call(object_server)) {
+      if(object_client1.call(object_server)) {
        ROS_INFO("Gate centre Coordinates are: [%f,%f] ##",
               object_server.response.x[0],object_server.response.y[0]);
        Gate_center_x = object_server.response.x[0];
@@ -181,7 +189,13 @@ void finalSurfaceUP() {
 int main(int argc, char **argv){
 
   ros::init(argc,argv,"PathPlanner");
-  // ros::NodeHandle nh;
+  ros::NodeHandle nh;
+  enable_yellow_flare_server_pub=nh.advertise<std_msgs::UInt8>("/enable_yellow_flare_server",1);
+  enable_gate_server_pub=nh.advertise<std_msgs::UInt8>("/enable_gate_server",1);
+
+  object_client1=nh.serviceClient<simulator_sauvc_test::Coordinates>("gate_coordinates");
+  object_client2=nh.serviceClient<simulator_sauvc_test::Coordinates>("yellow_flare_coordinates");
+
   ROS_INFO("Prequalification starts");
 
 
