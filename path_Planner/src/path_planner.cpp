@@ -19,6 +19,7 @@
 #include "std_msgs/String.h"
 
 #include <simulator_sauvc_test/Coordinates.h>
+#include <move_cmd/move_cmd.h>
 
 using namespace std;
 using namespace cv;
@@ -50,10 +51,10 @@ target Distance(double center_x, double center_y, double width, double height) {
   return p;
 }
 
-void initialHeave() {
+void initialHeave(ros::NodeHandle nh) {
 
-  //MoveCommand *initial = new MoveCommand();
-  //initial->heave();//TODO assign depth based on gate height
+  move_cmd *initial = new move_cmd(nh);
+  initial->enterHoverMode();//TODO assign depth based on gate height
 
 }
 
@@ -196,7 +197,7 @@ int main(int argc, char **argv){
 
 
   //gate_client = nh.serviceClient<simulator_sauvc_test::Coordinates>("gate_coordinates");
-  initialHeave();
+  initialHeave(nh);
   preQualify_phase1();
   preQualify_phase2();
   preQualify_phase3();

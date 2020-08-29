@@ -1,4 +1,4 @@
-#include "move_cmd.h"
+#include "move_cmd/move_cmd.h"
 move_cmd::move_cmd(ros::NodeHandle _nh): nh(_nh){
   cmd_pub = nh.advertise<hammerhead_control::MoveCmd>("/move_cmd", 100);
   mode_pub = nh.advertise<std_msgs::UInt8>("/set_mode", 10,true);
