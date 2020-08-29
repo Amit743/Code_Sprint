@@ -30,12 +30,6 @@ using namespace cv;
 #define pixelHeight 488
 #define fx 200
 #define fy 200
-#define to_t_surge 5
-#define to_t_sway 2
-
-ros::Publisher enable_yellow_flare_server_pub=nh.advertise<std_msgs::UInt8>("/enable_yellow_flare_server",1);
-ros::Publisher enable_gate_server_pub=nh.advertise<std_msgs::UInt8>("/enable_gate_server",1);
-=======
 
 std_msgs::UInt8 enabler;
 
@@ -43,6 +37,8 @@ ros::Publisher enable_yellow_flare_server_pub;
 ros::Publisher enable_gate_server_pub;
 simulator_sauvc_test::Coordinates object_server;
 ros::ServiceClient object_client1,object_client2;
+
+
 struct target{
   float x,y,d;
 };
@@ -64,7 +60,7 @@ void initialHeave() {
 void preQualify_phase1() {    // gate detection
 
   bool complete = false;
-  //move_cmd *phase1_command = new MoveCommand();
+  //MoveCommand *phase1_command = new MoveCommand();
   double Gate_center_x, Gate_center_y, width, height;
   while(!complete) {
       enabler.data = 1;
