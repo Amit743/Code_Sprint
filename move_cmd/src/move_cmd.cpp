@@ -2,7 +2,7 @@
 move_cmd::move_cmd(ros::NodeHandle _nh): nh(_nh){
   cmd_pub = nh.advertise<hammerhead_control::MoveCmd>("/move_cmd", 100);
   mode_pub = nh.advertise<std_msgs::UInt8>("/set_mode", 10,true);
-  bot_pos= nh.subscribe("bot_position",10,&move_cmd::distance,this)
+  bot_pos= nh.subscribe("bot_position",10,&move_cmd::distance,this);
   ROS_INFO("move_cmd::move_cmd()");
   a.wait_for_max_timer_to_timeout = 0;
   a.is_surge = 0;
@@ -34,7 +34,7 @@ move_cmd::move_cmd(ros::NodeHandle _nh): nh(_nh){
 move_cmd::~move_cmd(){
 
 }
-void distance(const hammerhead_control::Position::ConstPtr &msg){
+void move_cmd::distance(const hammerhead_control::Position::ConstPtr &msg){
   pos.x=msg->x;
   pos.y=msg->y;
   pos.z=msg->z;
@@ -220,15 +220,20 @@ int main(int argc, char **argv) {
     // auv.enterHoverMode();
     // ros::Duration(10).sleep();
     ROS_INFO("test::surge(10)");
-    auv.surge(1.5);
+      ROS_INFO("%f",auv.pos.x);
+      float tr=auv.pos.x+20;
+    while(tr-auv.pos.x>0)
+    {  auv.surge(2);
+      ROS_INFO("%f",auv.pos.x);
+    }
     // ROS_INFO("test::surge(-10)");
     // auv.surge(-10);
     // ROS_INFO("test::sway(10)");
     // auv.sway(10);
     // ROS_INFO("test::sway(-10)");
     // auv.sway(-10);
-    ROS_INFO("test::revolve(90)");
-    auv.revolve(360,2);
+    // ROS_INFO("test::revolve(90)");
+    // auv.revolve(360,2);
     // ROS_INFO("test::heave(1050)");
     // auv.heave(1000);
     // ROS_INFO("test::heave(980)");

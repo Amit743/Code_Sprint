@@ -25,7 +25,7 @@ class move_cmd {
 
   private:
     int sign(int);
-    void distance(const hammerhead_control::Position::ConstPtr);
+    void distance(const hammerhead_control::Position::ConstPtr &);
     ros::NodeHandle nh;
     ros::Publisher cmd_pub, mode_pub;
     ros::Subscriber bot_pos;
