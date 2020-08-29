@@ -43,6 +43,7 @@ ros::ServiceClient object_client1,object_client2;
 image_transport::Subscriber GT_sub;
 
 double Gate_center_x, Gate_center_y, width, height;
+move_cmd *sway_cmd;
 
 struct target{
   float x,y,d;
@@ -223,13 +224,33 @@ try{
             // std::cout<<"gate coord: "<< Gate_center_x<<" "<<Gate_center_y<<std::endl;
 
              float dist_h,dist_w;
-             dist_h=(50*1.50)/(height);
-             dist_w=(50*3)/width;
+             dist_h=29*(50*1.50)/(height);  // *29
+             dist_w=21*(50*3)/width;  // *21
              cout<<"dist_h is: "<<dist_h<<endl;
              cout<<"dist_w is: "<<dist_w<<endl;
+
+             // sway depth check from center
+             double diff_sway = (src.cols/2)-Gate_center_x;
+             double sway_d = 21*50*diff_sway*(1.0/15);
+             cout<<"dist from center SWAY: "<<sway_d<<" ("<<diff_sway<<")\n";
+             if(diff_sway>20){
+               cout<<"sway left ";
+               sway_cmd->sway(-1);
+               waitKey(5000);
+               cout<<"--- ends\n";
+             }
+             if(diff_sway<-20){
+               cout<<"sway right ";
+               sway_cmd->sway(1);
+               waitKey(5000);
+               cout<<"--- ends\n";
+             }
+
+
                }
 
 circle(src,Point(Gate_center_x ,Gate_center_y),10,Scalar(0,0,255),2,8,0);
+circle(src,Point(src.cols/2 ,src.rows/2),5,Scalar(0,255,0),2,8,0);
 imshow("window",src);
 waitKey(10);
 }
@@ -239,6 +260,7 @@ int main(int argc, char **argv){
   ros::init(argc,argv,"PathPlanner");
 
   ros::NodeHandle nh;
+  sway_cmd = new move_cmd(nh);
   image_transport::ImageTransport it(nh);
   enable_yellow_flare_server_pub=nh.advertise<std_msgs::UInt8>("/enable_yellow_flare_server",1);
   enable_gate_server_pub=nh.advertise<std_msgs::UInt8>("/enable_gate_server",1);
