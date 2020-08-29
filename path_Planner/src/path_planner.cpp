@@ -22,18 +22,26 @@
 
 using namespace std;
 using namespace cv;
+#define K 200
+//cm
+#define gateHeight 100
+#define gateWidth 200
+#define pixelWidth 648
+#define pixelHeight 488
+#define fx 200
+#define fy 200
 
-std_msgs::UInt8 enabler;
-cv::Mat src;
-simulator_sauvc_test::Coordinates object_server;
-ros::ServiceClient object_client;
-
-// Coordinates pub;isher
-ros::NodeHandle nh;
 ros::Publisher enable_yellow_flare_server_pub=nh.advertise<std_msgs::UInt8>("/enable_yellow_flare_server",1);
 ros::Publisher enable_gate_server_pub=nh.advertise<std_msgs::UInt8>("/enable_gate_server",1);
-
-double Distance(double center_x, double centyer_y, double width, double height) {
+struct target{
+  float x,y,d;
+};
+target Distance(double center_x, double center_y, double width, double height) {
+  target p;
+  p.d=0.9*fy*gateHeight/height+0.1*fx*gateWidth/width;
+  p.x=center_x/fx*p.d;
+  p.y=center_y/fy*p.d;
+  return p;
 }
 
 void initialHeave() {
