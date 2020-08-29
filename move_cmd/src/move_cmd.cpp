@@ -221,11 +221,27 @@ int main(int argc, char **argv) {
     // ros::Duration(10).sleep();
     ROS_INFO("test::surge(10)");
       ROS_INFO("%f",auv.pos.x);
-      float tr=auv.pos.x+20;
+      float tr=auv.pos.x+41;
     while(tr-auv.pos.x>0)
     {  auv.surge(2);
       ROS_INFO("%f",auv.pos.x);
     }
+      //auv.revolve(180,2);
+    auv.sway(4)  ;
+    auv.surge(15);
+    auv.sway(-20);
+    auv.yaw(90);
+    auv.yaw(68);
+
+
+    while(auv.pos.x>4){
+
+      auv.surge(2);
+      ROS_INFO("%f",auv.pos.x);
+    }
+
+
+
     // ROS_INFO("test::surge(-10)");
     // auv.surge(-10);
     // ROS_INFO("test::sway(10)");
@@ -244,9 +260,9 @@ int main(int argc, char **argv) {
     // ROS_INFO("test::yaw(-90)");
     // auv.yaw(-180);
     // ROS_INFO("test::enterSurfaceMode()");
-    ros::Duration(5).sleep();
+    //ros::Duration(5).sleep();
     auv.enterHoverMode();
-    ros::Duration(5).sleep();
+    //ros::Duration(5).sleep();
     auv.enterSurfaceMode();
     //
     //loop_rate.sleep();
