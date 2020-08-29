@@ -25,12 +25,14 @@ using namespace cv;
 #define K 200
 //cm
 #define gateHeight 100
-#define gateWidth 200  
+#define gateWidth 200
 #define pixelWidth 648
 #define pixelHeight 488
 #define fx 200
 #define fy 200
-
+#define to_t_surge 5
+#define to_t_sway 2
+ 
 ros::Publisher enable_yellow_flare_server_pub=nh.advertise<std_msgs::UInt8>("/enable_yellow_flare_server",1);
 ros::Publisher enable_gate_server_pub=nh.advertise<std_msgs::UInt8>("/enable_gate_server",1);
 struct target{
@@ -54,7 +56,7 @@ void initialHeave() {
 void preQualify_phase1() {    // gate detection
 
   bool complete = false;
-  //MoveCommand *phase1_command = new MoveCommand();
+  //move_cmd *phase1_command = new MoveCommand();
   double Gate_center_x, Gate_center_y, width, height;
   while(!complete) {
       enabler.data = 1;
