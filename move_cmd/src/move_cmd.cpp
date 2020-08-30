@@ -179,7 +179,7 @@ void move_cmd::yaw(double angle){
   a.sway_time = 0;
   a.sway = 0;
 
-  a.yaw_speed = 0.1;
+  a.yaw_speed = 0.05;
   a.yaw_time = abs(angle)/a.yaw_speed;
   a.yaw = angle;
 
@@ -226,36 +226,40 @@ void move_cmd::swayd(int d){
       ROS_INFO("%f,%f,%f",pos.x,pos.y,sqrt(pow(pos.x-x,2)+pow(pos.y-y,2)));
   }
 }
-void move_cmd::toPoint(int x,int y,int z){
+void move_cmd::toPointR(int x,int y,int z){
   ROS_INFO("test::heave(%d)",z);
   ROS_INFO("%f,%f,%f",pos.x,pos.y,pos.z);
   heave(z);
   ROS_INFO("test::surge(%d)",x);
   ROS_INFO("%f,%f,%f",pos.x,pos.y,pos.z);
-  yaw(-10);
-  ROS_INFO("%f yaw",pos.yaw);
-  yaw(10);
-  ROS_INFO("%f yaw",pos.yaw);
-  yaw(80);
-  ROS_INFO("%f yaw",pos.yaw);
+  ros::spinOnce();
   yaw(-pos.yaw);
+  ros::spinOnce();
   ROS_INFO("%f yaw",pos.yaw);
   float X=pos.x+x;
-  while(sign(x)*(X-pos.x)<0){
+  while(sign(x)*(X-pos.x)>0){
       surge(sign(x)*2);
+      ros::spinOnce();
       ROS_INFO("%f,%f",pos.x,pos.y);
   }
-  ROS_INFO("test::surge(%d)",x);
+  ROS_INFO("test::sway(%d)",y);
   ROS_INFO("%f,%f,%f",pos.x,pos.y,pos.z);
-  yaw(90);
-  float Y=pos.y+x;
-  while(sign(y)*(Y-pos.y)<0){
-      surge(sign(y)*2);
+  yaw(sign(y)*90);
+  ros::spinOnce();
+  float Y=pos.y+y;
+  while(sign(y)*(Y-pos.y)>0){
+      surge(2);
+      ros::spinOnce();
       ROS_INFO("%f,%f",pos.x,pos.y);
   }
-  yaw(-90);
+  ros::spinOnce();
+  yaw(-pos.yaw);
 
 }
+void move_cmd::toPoint(int x,int y,int z){
+  toPointR(x-pos.x,y-pos.y,z-pos.z);
+}
+
 void move_cmd::heaved(int d){
   ROS_INFO("test::heaved(%d)",d);
   ROS_INFO("%f",pos.z);

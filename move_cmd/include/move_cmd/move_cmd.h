@@ -24,6 +24,7 @@ class move_cmd {
     void surged(int);
     void swayd(int);
     void heaved(int);
+    void toPointR(int,int,int);
     void toPoint(int,int,int);
     hammerhead_control::Position pos;
 
