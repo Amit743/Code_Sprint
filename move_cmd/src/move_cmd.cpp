@@ -149,7 +149,7 @@ void move_cmd::heave(float dep){
   a.yaw_time = 0;
 
   a.depth = dep;
-  a.depth_speed = 5;
+  a.depth_speed = 2;
   a.depth_time = abs(dep)/a.depth_speed;
 
   a.isAbsolute = 0;
@@ -179,7 +179,7 @@ void move_cmd::yaw(double angle){
   a.sway_time = 0;
   a.sway = 0;
 
-  a.yaw_speed = 1;
+  a.yaw_speed = 0.1;
   a.yaw_time = abs(angle)/a.yaw_speed;
   a.yaw = angle;
 
@@ -197,14 +197,74 @@ void move_cmd::yaw(double angle){
 }
 void move_cmd::revolve(double angle,double radius=1){
   enterMovementMode();
-  int steps = (int)(angle/10);
+  int steps = (int)(abs(angle)/5);
   for(int i=0; i<steps;i++){
     surge(2*radius);
-    yaw(10);
+    yaw(sign(angle)*5);
     ROS_INFO("%f %c complete",100.0*i/steps,'%');
+    ros::spinOnce();
   }
 }
+void move_cmd::surged(int d){
+  ROS_INFO("test::surged(%d)",d);
+  ROS_INFO("%f,%f",pos.x,pos.y);
+  float x=pos.x+d*cos(pos.yaw*3.1415/180);
+  float y=pos.y+d*sin(pos.yaw*3.1415/180);
+  //ROS_INFO("%f,%f",x,y);
+  while(sqrt(pow(pos.x-x,2)+pow(pos.y-y,2))>2){
+      surge(sign(d)*2);
+      ROS_INFO("%f,%f,%f",pos.x,pos.y,sqrt(pow(pos.x-x,2)+pow(pos.y-y,2)));
+  }
+}
+void move_cmd::swayd(int d){
+  ROS_INFO("test::swayd(%d)",d);
+  ROS_INFO("%f,%f",pos.x,pos.y);
+  float x=pos.x-d*sin(pos.yaw*3.1415/180);
+  float y=pos.y+d*cos(pos.yaw*3.1415/180);
+  while(sqrt(pow(pos.x-x,2)+pow(pos.y-y,2))>2){
+      sway(sign(d)*2);
+      ROS_INFO("%f,%f,%f",pos.x,pos.y,sqrt(pow(pos.x-x,2)+pow(pos.y-y,2)));
+  }
+}
+void move_cmd::toPoint(int x,int y,int z){
+  ROS_INFO("test::heave(%d)",z);
+  ROS_INFO("%f,%f,%f",pos.x,pos.y,pos.z);
+  heave(z);
+  ROS_INFO("test::surge(%d)",x);
+  ROS_INFO("%f,%f,%f",pos.x,pos.y,pos.z);
+  yaw(-10);
+  ROS_INFO("%f yaw",pos.yaw);
+  yaw(10);
+  ROS_INFO("%f yaw",pos.yaw);
+  yaw(80);
+  ROS_INFO("%f yaw",pos.yaw);
+  yaw(-pos.yaw);
+  ROS_INFO("%f yaw",pos.yaw);
+  float X=pos.x+x;
+  while(sign(x)*(X-pos.x)<0){
+      surge(sign(x)*2);
+      ROS_INFO("%f,%f",pos.x,pos.y);
+  }
+  ROS_INFO("test::surge(%d)",x);
+  ROS_INFO("%f,%f,%f",pos.x,pos.y,pos.z);
+  yaw(90);
+  float Y=pos.y+x;
+  while(sign(y)*(Y-pos.y)<0){
+      surge(sign(y)*2);
+      ROS_INFO("%f,%f",pos.x,pos.y);
+  }
+  yaw(-90);
 
+}
+void move_cmd::heaved(int d){
+  ROS_INFO("test::heaved(%d)",d);
+  ROS_INFO("%f",pos.z);
+  float tr=pos.z+d;
+  while(sign(d)*(tr-pos.z)>0){
+      heave(sign(d)*2);
+      ROS_INFO("%f",pos.z);
+  }
+}
 int move_cmd::sign(int i){
   return (i<0)?-1:1;
 }
@@ -216,16 +276,12 @@ int main(int argc, char **argv) {
   ros::Rate loop_rate(30);
   //while (ros::ok()) {
     ros::spinOnce();
-    // ROS_INFO("test::enterHoverMode()");
-    // auv.enterHoverMode();
-    // ros::Duration(10).sleep();
-    ROS_INFO("test::surge(10)");
-      ROS_INFO("%f",auv.pos.x);
-      float tr=auv.pos.x+41;
-    while(tr-auv.pos.x>0)
-    {  auv.surge(2);
-      ROS_INFO("%f",auv.pos.x);
-    }
+    ROS_INFO("test::enterHoverMode()");
+    auv.enterHoverMode();
+    ros::Duration(10).sleep();
+    auv.surged(10);
+    auv.swayd(-7);
+    auv.surged(5);
       //auv.revolve(180,2);
     auv.sway(4)  ;
     auv.surge(15);

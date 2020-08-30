@@ -21,6 +21,10 @@ class move_cmd {
     void heave(float);
     void yaw(double);
     void revolve(double,double);
+    void surged(int);
+    void swayd(int);
+    void heaved(int);
+    void toPoint(int,int,int);
     hammerhead_control::Position pos;
 
   private:
