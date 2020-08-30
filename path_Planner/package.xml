@@ -59,6 +59,8 @@
   <exec_depend>message_runtime</exec_depend>
   <depend>move_cmd</depend>
 
+  <!--<depend>image_transport<depend/>-->
+
 
 
   <!-- The export tag contains other, unspecified, tags -->

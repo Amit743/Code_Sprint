@@ -15,6 +15,11 @@ find_package(catkin REQUIRED COMPONENTS
   move_cmd
   simulator_sauvc_test
   hammerhead_control
+  hammerhead
+  sensor_msgs
+image_transport
+cv_bridge
+
 )
 
 ## System dependencies are found with CMake's conventions

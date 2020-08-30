@@ -63,6 +63,7 @@ void SimSauvcTest::process_next_image_front(
     cout<<" caught\n";
     return;
   }
+  imshow("fronttt", front_image); waitKey(20);
   has_image_received = true;
 }
 
@@ -132,6 +133,8 @@ bool SimSauvcTest::getGateCoordinates(
       std::cout<<"\n## Request Denied ##\n";
       return false;
     }
+    if(GT.coordinates_x.size()==0)
+      return false;
     std::cout << "## Request Accepted ##" << '\n';
     res.x.push_back((GT.coordinates_x[0]+GT.coordinates_x[1])/2);
     res.y.push_back((GT.coordinates_y[0]+GT.coordinates_y[1])/2);
@@ -148,9 +151,12 @@ void SimSauvcTest::imageProcessingGate() {
   GT_green.gauss_frame=GT.gauss_frame.clone();
   cv::inRange(GT.gauss_frame, Scalar(GT.thresh_l_B, GT.thresh_l_G, GT.thresh_l_R), Scalar(GT.thresh_h_B, GT.thresh_h_G ,GT.thresh_h_R),GT.gray_frame);
   cv::inRange(GT_green.gauss_frame, Scalar(GT_green.thresh_l_B, GT_green.thresh_l_G, GT_green.thresh_l_R), Scalar(GT_green.thresh_h_B, GT_green.thresh_h_G ,GT_green.thresh_h_R),GT_green.gray_frame);
+  // GT.morph_frame=GT.morph_op(GT.gray_frame);
   // GT.gray_frame=(GT.gray_frame | GT_green.gray_frame);
   cv::Canny( GT.gray_frame,GT.canny_frame,GT.canny_low_thresh,GT.canny_ratio,GT.canny_kernel_size);
-
+  // circle(front_image,Point((min_x+max_x)/2,(min_y+max_y)/2),10,Scalar(0,0,255),2,8,0);
+  imshow("server_window",GT.gray_frame);
+  cv::waitKey(1);
   int min_x=1000,min_y=1000, max_x=0, max_y=0;
  //--------using hough line------------
   float a;
@@ -180,6 +186,8 @@ void SimSauvcTest::imageProcessingGate() {
   GT.coordinates_x.push_back(max_x);
   GT.coordinates_y.push_back(min_y);
   GT.coordinates_y.push_back(max_y);
+
+
   if(detection_status_gate) gate_detect_status_pub.publish(enabled);
   else gate_detect_status_pub.publish(disabled);
 }
@@ -286,6 +294,7 @@ bool SimSauvcTest::getFlareCoordinates(
         std::cout<<"\n## Request Denied ##\n";
         return false;
       }
+      if(RF.coordinates_x.size()==0) return false;
       std::cout << "## Request Accepted ##" << '\n';
       for(int i=0; i<RF.coordinates_x.size(); i+=2){
         res.x.push_back((RF.coordinates_x[i]+RF.coordinates_x[i+1])/2);
@@ -359,6 +368,7 @@ bool SimSauvcTest::getYellowFlareCoordinates(
       std::cout<<"\n## Request Denied ##\n";
       return false;
     }
+    if(YF.coordinates_x.size()==0) return false;
     std::cout << "## Request Accepted ##" << '\n';
     cout<<"\n size: "<<YF.coordinates_x.size()<<endl;
     if(YF.coordinates_x.size()<=0) return false;
@@ -385,8 +395,7 @@ void SimSauvcTest::imageProcessingYellowFlare() {
   cv::Canny( YF.morph_frame,YF.canny_frame,YF. canny_low_thresh,YF.canny_ratio,YF.canny_kernel_size );
   vector<vector<Point> > contours;
   vector<Vec4i> hierarchy;
-  // imshow("server", YF.gray_frame);
-  // waitKey(10);
+
   findContours(YF.canny_frame,contours, hierarchy,RETR_TREE,CHAIN_APPROX_SIMPLE);
   vector<vector<Point> > contours_poly(contours.size());
   vector<Rect> boundRect(contours.size());
@@ -402,7 +411,10 @@ void SimSauvcTest::imageProcessingYellowFlare() {
       YF.coordinates_x.push_back(boundRect[i].br().x);
       YF.coordinates_y.push_back(boundRect[i].br().y);
     }
-  // rectangle(front_image,boundRect[i].tl(), boundRect[i].br(),Scalar(0,255,0));
+  rectangle(YF.gray_frame,boundRect[i].tl(), boundRect[i].br(),Scalar(0,255,0));
+  //circle(YF.gray_frame,Point(boundRect[i].tl().x+ ,Gate_center_y),10,Scalar(0,0,255),2,8,0);
+  imshow("server_yellow", YF.gray_frame);
+  waitKey(10);
   }
   if(YF.coordinates_x.size()>0) detection_status_yellow_flare = 1;
   else detection_status_yellow_flare = 0;
