@@ -18,14 +18,16 @@ class move_cmd {
     void enterSurfaceMode();
     void surge(int);
     void sway(int);
-    void heave(float);
+    void heaveD(float);
     void yaw(double);
     void revolve(double,double);
     void surged(int);
     void swayd(int);
-    void heaved(int);
+    void heaveAbs(int);
     void toPointR(int,int,int);
     void toPoint(int,int,int);
+    void toPointDiag(int,int,int);
+    void toPointDiagR(int,int,int);
     hammerhead_control::Position pos;
 
   private:

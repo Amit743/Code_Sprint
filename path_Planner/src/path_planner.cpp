@@ -125,41 +125,39 @@ void marker1() {    // yellow flare
 
 void hexagon() {
 
-  int x=0,y=-130;
+  int x=-10,y=-130,z=1050;
+  auv->toPoint(x,y,z)
 
-  //auv->yaw()
-  auv->surged(x);
-  auv->swayd(y);
-  object_server.request.dummy = 1;
-  double distance;
-  double Gate_center_x, Gate_center_y, width, height;
-  while(distance > 3) {
-    enabler.data = 1;
-    enable_gate_server_pub.publish(enabler);
-    enable_pub.publish(enabler);
-
-      if(object_client1.call(object_server)) {
-       ROS_INFO("Gate centre Coordinates are: [%f,%f] ##",
-              object_server.response.x[0],object_server.response.y[0]);
-       Gate_center_x = object_server.response.x[0];
-       Gate_center_y = object_server.response.y[0];
-       width = object_server.response.w[0];
-       height = object_server.response.h[0];
-       std::cout<<"gate coord: "<< Gate_center_x<<" "<<Gate_center_y<<std::endl;
-       ros::spinOnce();
-
-      }
+  // object_server.request.dummy = 1;
+  // double distance;
+  // double Gate_center_x, Gate_center_y, width, height;
+  // while(distance > 3) {
+  //   enabler.data = 1;
+  //   enable_gate_server_pub.publish(enabler);
+  //   enable_pub.publish(enabler);
+  //
+  //     if(object_client1.call(object_server)) {
+  //      ROS_INFO("Gate centre Coordinates are: [%f,%f] ##",
+  //             object_server.response.x[0],object_server.response.y[0]);
+  //      Gate_center_x = object_server.response.x[0];
+  //      Gate_center_y = object_server.response.y[0];
+  //      width = object_server.response.w[0];
+  //      height = object_server.response.h[0];
+  //      std::cout<<"gate coord: "<< Gate_center_x<<" "<<Gate_center_y<<std::endl;
+  //      ros::spinOnce();
+  //
+  //     }
 
       //distance = Distance(Gate_center_x, Gate_center_y, width, height);
    //   phase3_command->surge(); // add value accordingly
-  }
+  //}
 
   //phase3_command->surge(8); //assume 8ft to surge for completion of final gate cross
   //delete phase3_command;
 
   // stop server
-  enabler.data = 0;
-  enable_gate_server_pub.publish(enabler);
+  // enabler.data = 0;
+  // enable_gate_server_pub.publish(enabler);
 
 }
 
@@ -242,8 +240,7 @@ int main(int argc, char **argv){
   object_client1=nh.serviceClient<simulator_sauvc_test::Coordinates>("gate_coordinates");
   object_client2=nh.serviceClient<simulator_sauvc_test::Coordinates>("yellow_flare_coordinates");
   auv=new move_cmd(nh);
-  ROS_INFO("Prequalification starts");
-
+  ROS_INFO("finals starts");
   start();
   gate();
   //marker1();
@@ -251,9 +248,9 @@ int main(int argc, char **argv){
   stop();
   enable_pub=nh.advertise<std_msgs::UInt8>("/enable_ip_front_cam",1);
 
-  GT_sub=it.subscribe("/front_camera/image_rect_color", 1,
-                   &imageCallback);
-  ROS_INFO("Prequalification starts");
+  //GT_sub=it.subscribe("/front_camera/image_rect_color", 1,
+  //                 &imageCallback);
+  //ROS_INFO("Prequalification starts");
 
 
   //gate_client = nh.serviceClient<simulator_sauvc_test::Coordinates>("gate_coordinates");
@@ -262,7 +259,7 @@ int main(int argc, char **argv){
 //  preQualify_phase2();
 //  preQualify_phase3();
 //  finalSurfaceUP();
-  ROS_INFO("Prequalification overs");
+  //ROS_INFO("Prequalification overs");
 
   ros::spin();
   return 0;
