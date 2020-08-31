@@ -182,7 +182,7 @@ void move_cmd::yaw(double angle){
 
   a.yaw_speed = 0.05;
   a.yaw_time = abs(angle)/a.yaw_speed;
-  // a.yaw_time = (a.yaw_time>15)?15:a.yaw_time;
+  a.yaw_time = (a.yaw_time>30)?30:a.yaw_time;
   a.yaw = angle;
 
   a.depth = 0;
@@ -238,13 +238,13 @@ void move_cmd::toPointR(int x,int y,int z){
   ROS_INFO("%f,%f,%f",pos.x,pos.y,pos.z);
   ros::spinOnce();
   ROS_INFO("yaw %f",pos.yaw);
-  yaw(-pos.yaw);
+  yaw((sign(x)-1)*90-pos.yaw);
   ros::spinOnce();
   ROS_INFO("%f yaw",pos.yaw);
 
   float X=pos.x+x;
   while(sign(x)*(X-pos.x)>0){
-      surge(sign(x)*2);
+      surge(2);
       ros::spinOnce();
       ROS_INFO("%f,%f",pos.x,pos.y);
   }
@@ -267,7 +267,7 @@ if(abs(y)>3){
 }
   ros::spinOnce();
   ros::Duration(3).sleep();
-  yaw(-pos.yaw);
+//  yaw(-pos.yaw);
 
 }
 void move_cmd::toPointDiagR(int x,int y,int z){
@@ -284,7 +284,7 @@ void move_cmd::toPointDiagR(int x,int y,int z){
   surged(dist);
   ros::spinOnce();
   ROS_INFO("test::yaw(%f)",-angle);
-  yaw(-pos.yaw);
+  //yaw(-pos.yaw);
 }
 void move_cmd::toPointDiag(int x,int y,int z){
   ros::spinOnce();
@@ -315,15 +315,17 @@ int main(int argc, char **argv) {
     ROS_INFO("test::enterHoverMode()");
     auv.enterHoverMode();
     ros::Duration(12).sleep();
-    //auv.toPointDiagR(-18,-10,180);
-    ROS_INFO("test::toPointDiagR()");
-    auv.toPointDiagR(17,-8,130);
-    ROS_INFO("test::revolve(-90,2)");
-    auv.revolve(-90,2);
-    ROS_INFO("test::toPointDiag()");
-    auv.toPointDiag(-8,-130,1050);
-    ROS_INFO("test::toPoint()");
-    auv.toPoint(-8,-130,1050);
+
+     auv.toPointR(-18,-10,120);
+    // auv.yaw(-170);
+    // ROS_INFO("test::toPointDiagR()");
+    // auv.toPointDiagR(17,-8,130);
+    // ROS_INFO("test::revolve(-90,2)");
+    // auv.revolve(-90,2);
+    // ROS_INFO("test::toPointDiag()");
+    // auv.toPointDiag(-8,-130,1050);
+    // ROS_INFO("test::toPoint()");
+    // auv.toPoint(-8,-130,1050);
     //ros::Duration(10).sleep();
     //auv.toPointR(0,10,1);
     // auv.surged(10);
